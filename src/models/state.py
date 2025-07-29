@@ -237,7 +237,7 @@ class StateVector(BaseModel):
 
 class OpenSkyResponse(BaseModel):
     time: int
-    states: map[str, StateVector]
+    states: dict[str, StateVector]
 
 
 def get_current_data() -> OpenSkyResponse:
