@@ -237,7 +237,7 @@ class StateVector(BaseModel):
 
 class OpenSkyResponse(BaseModel):
     time: int
-    states: List[StateVector]
+    states: map[str, StateVector]
 
 
 def get_current_data() -> OpenSkyResponse:
@@ -250,14 +250,14 @@ def get_current_data() -> OpenSkyResponse:
     
     raw_states = data.get("states", [])
     
-    structured_states = []
+    structured_states = {}
 
     for state in raw_states:
         if len(state) != len(field_names):
             raise ValueError(f"State vector length mismatch: expected {len(field_names)}, got {len(state)}")
         
         state_data = {field: value for field, value in zip(field_names, state)}
-        structured_states.append(StateVector(**state_data))
+        structured_states[state_data["icao24"]] = StateVector(**state_data)
 
     if "time" not in data:
         raise ValueError("Invalid response format: 'time' key not found")
@@ -268,6 +268,5 @@ def get_current_data() -> OpenSkyResponse:
 if __name__ == "__main__":
     try:
         response = get_current_data()
-        print(response)
     except Exception as e:
         print(f"An error occurred: {e}")
